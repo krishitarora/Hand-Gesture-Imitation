@@ -2,6 +2,8 @@
 
 This is a project to make a robotic hand imitate hand gestures performed by a human.
 
+[![Hand Gesture Imitation](https://img.youtube.com/vi/0oRFu816ebQ/0.jpg)](https://www.youtube.com/watch?v=0oRFu816ebQ)
+
 ## Getting Started
 
 ### There are 3 files, a .py file, a .pb model and .ino file.
@@ -126,7 +128,7 @@ Video Capture of the Gesture Classification is available here:
 - msys2-conda-epoch=20160418=1
 - numpy=1.13.1=py36_0
 
-##Acknowledgement
+## Acknowledgement
 Thanks to Invento Robotics for giving me the opportunity to work on this project, specially to Balaji Sir.
 Hat tip to:
 Vivek, Raushan, Pranav, Shruti and Bharat Sir for help with the hardware part.
