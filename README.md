@@ -130,6 +130,9 @@ Video Capture of the Gesture Classification is available here:
 
 ## Acknowledgement
 Thanks to Invento Robotics for giving me the opportunity to work on this project, specially to Balaji Sir.
+
 Hat tip to:
+
 Vivek, Raushan, Pranav, Shruti and Bharat Sir for help with the hardware part.
+
 Ashish, Hemant for help with the software part.
