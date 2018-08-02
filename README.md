@@ -7,7 +7,9 @@ This is a project to make a robotic hand imitate hand gestures performed by a hu
 ### There are 3 files, a .py file, a .pb model and .ino file.
 
 The .py file contains the Python code for Hand Gesture Classification.
+
 The .pb file contains the trained model that is imported by the python file.
+
 The .ino file is the Arduino file used to communicate with and control the Ardiuno Mega connected with the Robotic Hand.
 
 Large parts of the code are self-explanatory. Comments are added to make it more understandable.
@@ -21,7 +23,9 @@ The removeBG function does majority of the pre-processing. Information about the
 ## Result:
 
 The result is classification by the CNN into 4 classes: One, Two, Five, Okay. More classes can be added with ease once training data is available.
+
 The Python file then communicates with the Arduino and the hand gesture is imitated.
+
 The parts of code relating to Arduino in the python file have been commented so that atleast the classifciation part can be run if hardware is unavailable.
 
 ## Program flow is as follows:
@@ -40,7 +44,7 @@ To reset static background, press r.
 To close windows, press Esc.
 
 Video Capture of the Gesture Classification is available here:
-[linkname](https://youtu.be/TLEVXG2YohI)
+[Hand Gesture Classification](https://youtu.be/TLEVXG2YohI)
 
 ## Dependencies:
 - click=6.7=py36hec8c647_0
