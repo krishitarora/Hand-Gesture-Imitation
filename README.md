@@ -6,7 +6,7 @@ This is a project to make a robotic hand imitate hand gestures performed by a hu
 
 ### The .py file contains the Python code for Hand Gesture Classification.
 ### The .pb file contains the trained model that is imported by the python file.
-### The .ino file is the Arduino file used to communicate with and control the Ardiuno Mega placed inside the Robotic Hand.
+### The .ino file is the Arduino file used to communicate with and control the Ardiuno Mega connected with the Robotic Hand.
 
 Large parts of the code are self-explanatory. Comments are added to make it more understandable.
 
@@ -120,3 +120,8 @@ Video Capture of the Gesture Classification is available here:
 - msys2-conda-epoch=20160418=1
 - numpy=1.13.1=py36_0
 
+##Acknowledgement
+Thanks to Invento Robotics for giving me the opportunity to work on this project.
+Hat tip to:
+Vivek, Raushan, Pranav, Shruti and Bharat Sir for help with the hardware part.
+Ashish, Hemant for help with the software part.
