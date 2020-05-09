@@ -138,9 +138,11 @@ def classify(time_now):
 # parameters
 cap_region_x_begin=0.5  # start point/total width
 cap_region_y_end=0.8  # start point/total width
-threshold = 60  #  BINARY threshold
-blurValue = 41  # GaussianBlur parameter
+#threshold = 60  #  BINARY threshold
+#blurValue = 9  # GaussianBlur parameter
 bgSubThreshold = 50
+
+
 
 # variables
 isBgCaptured = 0   # bool, whether the background captured
@@ -162,11 +164,35 @@ def removeBG(frame):
     return res
 
 
+def calculateFingers(res,drawing):  # finished bool, cnt: finger count
+    #  convexity defect
+    hull = cv2.convexHull(res, returnPoints=False)
+    if len(hull) > 3:
+        defects = cv2.convexityDefects(res, hull)
+        if type(defects) != type(None):  # avoid crashing.   (BUG not found)
+
+            cnt = 0
+            for i in range(defects.shape[0]):  # calculate the angle
+                s, e, f, d = defects[i][0]
+                start = tuple(res[s][0])
+                end = tuple(res[e][0])
+                far = tuple(res[f][0])
+                a = math.sqrt((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2)
+                b = math.sqrt((far[0] - start[0]) ** 2 + (far[1] - start[1]) ** 2)
+                c = math.sqrt((end[0] - far[0]) ** 2 + (end[1] - far[1]) ** 2)
+                angle = math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c))  # cosine theorem
+                if angle <= math.pi / 2:  # angle less than 90 degree, treat as fingers
+                    cnt += 1
+                    cv2.circle(drawing, far, 8, [211, 84, 0], -1)
+            return True, cnt
+    return False, 0
+
 
 
 # Camera
 camera = cv2.VideoCapture(0)
 camera.set(10,200)
+
 
 continuous=False
 
@@ -185,7 +211,46 @@ while i<1:
         img = removeBG(frame)
         img = img[0:int(cap_region_y_end * frame.shape[0]),
                     int(cap_region_x_begin * frame.shape[1]):frame.shape[1]]  # clip the ROI
-        cv2.imshow('mask', img)
+        cv2.imshow('Coloured Background Subtraction', img)
+        
+    # convert the image into binary image
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #blur = cv2.GaussianBlur(gray, (blurValue, blurValue), 0)
+        blur = cv2.medianBlur(gray,9)
+        cv2.imshow('Blurred', blur)
+
+        #ret1,thresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        ret1,thresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        cv2.imshow('Threshold', thresh)
+        
+    # get the coutours
+        thresh1 = copy.deepcopy(thresh)
+        image, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        length = len(contours)
+        maxArea = -1
+        if length > 0:
+            for j in range(length):  # find the biggest contour (according to area)
+                temp = contours[j]
+                area = cv2.contourArea(temp)
+                if area > maxArea:
+                    maxArea = area
+                    ci = j
+
+            res = contours[ci]
+            hull = cv2.convexHull(res)
+            drawing = np.zeros(img.shape, np.uint8)
+            cv2.drawContours(drawing, [res], 0, (0, 255, 0), 2)
+            cv2.drawContours(drawing, [hull], 0, (0, 0, 255), 3)
+
+            #isFinishCal,cnt = calculateFingers(res,drawing)
+            #if triggerSwitch is True:
+            #    if isFinishCal is True and cnt <= 2:
+            #        print (cnt)
+                    # app('System Events').keystroke(' ')  # simulate pressing blank space
+
+        cv2.imshow('Contours', drawing)
+        
+    
 
 
     # Keyboard Input operation
@@ -206,8 +271,11 @@ while i<1:
             continuous=True
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             time_now= str(datetime.datetime.now().time()).replace(':', '_').replace('.','_')
-            cv2.imwrite('pics/'+time_now+'.jpg', img_gray)
-            label, prob = classify(time_now)
+            cv2.imwrite('pics/'+'BSG'+time_now+'.jpg', img_gray)
+            cv2.imwrite('pics/Contour/'+'Contour'+time_now+'.jpg', drawing)
+            cv2.imwrite('pics/JBS/'+'JBS'+time_now+'.jpg', img)
+            cv2.imwrite('pics/Thresh/'+'Thresh'+time_now+'.jpg', thresh)
+            label, prob = classify('BSG'+time_now)
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(img_gray, label,(10,350), font, 2,(255,255,255), 2 ,cv2.LINE_AA)
             cv2.imshow('output_c', img_gray)
@@ -217,12 +285,16 @@ while i<1:
         else:
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             time_now= str(datetime.datetime.now().time()).replace(':', '_').replace('.','_')
-            cv2.imwrite('pics/'+time_now+'.jpg', img_gray) #fix path accordingly
-            label, prob = classify(time_now)
+            cv2.imwrite('pics/'+'BSG'+time_now+'.jpg', img_gray)
+            cv2.imwrite('pics/Contour/'+'Contour'+time_now+'.jpg', drawing)
+            cv2.imwrite('pics/JBS/'+'JBS'+time_now+'.jpg', img)
+            cv2.imwrite('pics/Thresh/'+'Thresh'+time_now+'.jpg', thresh)
+            label, prob = classify('BSG'+time_now)
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(img_gray, label,(10,350), font, 2,(255,255,255), 2 ,cv2.LINE_AA)
             cv2.imshow('output', img_gray)
             print("Successfully Classified.")
+            
     elif k == ord('r'):  # press 'r' to reset the background
         bgModel = None
         triggerSwitch = False
